@@ -22,16 +22,16 @@ div.container {
     width: 50%;
     /* Finally, center it */
     margin: 0 auto;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 div.container p {
-    /* Just make the text white and add a sans serif font */
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 div.container h1 {
-    /* Make the text white and add a sans serif font */
     color: white;
     font-family: Arial, Helvetica, sans-serif;
 }
