@@ -39,6 +39,48 @@ function namegen(count) {
 	return ret;
 };
 
+function genplanet() {
+    var data = planetinfogen();
+    if (data.civilization == "none") {
+        var civString = "no civilization";
+    } else {
+        var civString = "a " + data.civilization + " civilization";
+    }
+    var convertedLife = data.life;
+    if (convertedLife == "none" || convertedLife == "microscopic" || convertedLife == "complex" || convertedLife == "simple") {
+        convertedLife = "no";
+    }
+    var html = `
+    <h1>The planet ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
+    <p>This planet is a ${data.size} ${data.type} planet. It has a ${data.atmosphere} atmosphere, and is ${data.temperature} and has ${data.gravity} gravity. It has ${convertedLife} life, and is home to ${civString}.</p>
+    `;
+    if (convertedLife != "no") {
+        html += `<p>There are ${data.countrycount} countries on this planet:</p>`;
+        html += "<ul style='color: white;font-family: Arial, Helvetica, sans-serif;'>";
+        for (var i = 0; i < data.countries.length; i++) {
+            html += `<li>The ${data.countries[i].type} of ${data.countries[i].name[0].toUpperCase() + data.countries[i].name.substring(1)}</li>`;
+        }
+        html += "</ul>";
+    }
+    writeContent(html);
+}
+
+function gencountry() {
+    var civtype = pickRandom(["stone-age", "bronze-age/seafaring", "iron-age/agricultural", "at war (primitive)", "at war (nuclear)", "at war (verge of extinction)", "dystopia", "utopia", "industrial (developing)", "industrial (unstable)", "industrial", "space-age", "advanced", "medieval", "nuclear age/air travel", "information age", "information age", "machine intelligence era", "quantum era", "interstellar era", "post-apocalyptic", "post-apocalyptic"]);
+    var data = gencountryfromciv(civtype);
+    var html = `
+    <h1>The ${data.type} of ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
+    <p>This country is a ${data.type} country. It is a ${data.civtype} civilization. It has ${data.population} people, and is ruled by a ${data.government} government. It has a ${data.economy} economy, and is ${data.military} in military strength.</p>
+    <p>It has ${data.citycount} cities:</p>
+    `;
+    html += "<ul style='color: white;font-family: Arial, Helvetica, sans-serif;'>";
+    for (var i = 0; i < data.cities.length; i++) {
+        html += `<li>${data.cities[i].name[0].toUpperCase() + data.cities[i].name.substring(1)}</li>`;
+    }
+    html += "</ul>";
+    writeContent(html);
+}
+
 ///////////////////////////// Planet Generation /////////////////////////////
 
 function gentempfromtype(type) {
@@ -102,8 +144,8 @@ function genlifefromatmosphere(atmosphere) {
     }
 }
 
-function generateNumCountriesFromCiv(civtype) {
-    if (civtype == "none" || civtype == "primitive" || civtype == "post-apocalyptic") {
+function generateNumCountriesFromCiv(civtype, life) {
+    if (civtype == "none" || civtype == "primitive" || life == "simple" || life == "microscopic" || life == "complex" || life == "none" || civtype == "post-apocalyptic") {
         return 0;
     } else {
         return randomRange(1, 12);
@@ -130,32 +172,6 @@ function planetinfogen() {
         "countries": gencountries(numcountries, civ),
     } 
     return data;
-}
-
-function genplanet() {
-    var data = planetinfogen();
-    if (data.civilization == "none") {
-        var civString = "no civilization";
-    } else {
-        var civString = "a " + data.civilization + " civilization";
-    }
-    var convertedLife = data.life;
-    if (convertedLife == "none") {
-        convertedLife = "no";
-    }
-    var html = `
-    <h1>The planet ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
-    <p>This planet is a ${data.size} ${data.type} planet. It has a ${data.atmosphere} atmosphere, and is ${data.temperature} and has ${data.gravity} gravity. It has ${convertedLife} life, and is home to ${civString}.</p>
-    <p>There are ${data.countrycount} countries on this planet:</p>
-    `;
-    if (data.civilization != "none") {
-        html += "<ul style='color: white;font-family: Arial, Helvetica, sans-serif;'>";
-        for (var i = 0; i < data.countries.length; i++) {
-            html += `<li>The ${data.countries[i].type} of ${data.countries[i].name[0].toUpperCase() + data.countries[i].name.substring(1)}</li>`;
-        }
-        html += "</ul>";
-    }
-    writeContent(html);
 }
 
 ///////////////////////////// Country/Town Generation /////////////////////////////
