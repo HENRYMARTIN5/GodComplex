@@ -39,8 +39,25 @@ function namegen(count) {
 	return ret;
 };
 
-function genplanet() {
-    var data = planetinfogen();
+function displaysystem(data) {
+    var fixedType = data.star.type;
+    if (fixedType != "black hole") {
+        fixedType = fixedType + " star";
+    }
+    var html = `
+    <h1>The ${data.name[0].toUpperCase() + data.name.substring(1)} system</h1>
+    <p>This system contains a ${data.star.color} ${data.star.type} with a ${data.star.size} size and a ${data.star.temperature} temperature.</p>
+    <p>Contains ${data.planetcount} planets:</p>
+    `;
+    html += "<ul style='color: white;font-family: Arial, Helvetica, sans-serif;'>";
+    for (var i = 0; i < data.planets.length; i++) {
+        html += `<li><a href="#" onclick="genplanet(${i})">${data.planets[i].name[0].toUpperCase() + data.planets[i].name.substring(1)}</a></li>`;
+    }
+    html += "</ul>";
+    writeContent(html);
+}
+
+function displayplanet(data) {
     if (data.civilization == "none") {
         var civString = "no civilization";
     } else {
@@ -65,20 +82,84 @@ function genplanet() {
     writeContent(html);
 }
 
-function gencountry() {
-    var civtype = pickRandom(["stone-age", "bronze-age/seafaring", "iron-age/agricultural", "at war (primitive)", "at war (nuclear)", "at war (verge of extinction)", "dystopia", "utopia", "industrial (developing)", "industrial (unstable)", "industrial", "space-age", "advanced", "medieval", "nuclear age/air travel", "information age", "information age", "machine intelligence era", "quantum era", "interstellar era", "post-apocalyptic", "post-apocalyptic"]);
-    var data = gencountryfromciv(civtype);
+function displaycountry(data) {
     var html = `
     <h1>The ${data.type} of ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
-    <p>This country is a ${data.type} country. It is a ${data.civtype} civilization. It has ${data.population} people, and is ruled by a ${data.government} government. It has a ${data.economy} economy, and is ${data.military} in military strength.</p>
-    <p>It has ${data.citycount} cities:</p>
+    <p>Contains ${data.population} people, and is ruled by a ${data.government} government. It has a ${data.economy}, and is ${data.military} in military strength.</p>
+    <p>It has ${data.numtowns} settlements inside it:</p>
     `;
     html += "<ul style='color: white;font-family: Arial, Helvetica, sans-serif;'>";
-    for (var i = 0; i < data.cities.length; i++) {
-        html += `<li>${data.cities[i].name[0].toUpperCase() + data.cities[i].name.substring(1)}</li>`;
+    for (var i = 0; i < data.towns.length; i++) {
+        html += `<li>${data.towns[i].name[0].toUpperCase() + data.towns[i].name.substring(1)}</li>`;
     }
     html += "</ul>";
     writeContent(html);
+}
+
+function displaytown(data) {
+    var html = `
+    <h1>The ${data.type} of ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
+    <p>This settlement contains ${data.population} people. It has a ${data.economy} economy, and is ${data.mood} towards outsiders.</p>
+    `
+    writeContent(html);
+}
+
+function gensystem() {
+    var data = systeminfogen();
+    console.log(data);
+    displaysystem(data);
+}
+
+function genplanet() {
+    var data = planetinfogen();
+    console.log(data);
+    displayplanet(data);
+}
+
+function gencountry() {
+    var civtype = pickRandom(["stone-age", "bronze-age/seafaring", "iron-age/agricultural", "at war (primitive)", "at war (nuclear)", "at war (verge of extinction)", "dystopia", "utopia", "industrial (developing)", "industrial (unstable)", "industrial", "space-age", "advanced", "medieval", "nuclear age/air travel", "information age", "information age", "machine intelligence era", "quantum era", "interstellar era", "post-apocalyptic", "post-apocalyptic"]);
+    var data = gencountryfromciv(civtype);
+    console.log(data);
+    displaycountry(data);
+}
+
+function gentown() {
+    var civtype =  pickRandom(["stone-age", "bronze-age/seafaring", "iron-age/agricultural", "at war (primitive)", "at war (nuclear)", "at war (verge of extinction)", "dystopia", "utopia", "industrial (developing)", "industrial (unstable)", "industrial", "space-age", "advanced", "medieval", "nuclear age/air travel", "information age", "information age", "machine intelligence era", "quantum era", "interstellar era", "post-apocalyptic", "post-apocalyptic"]);
+    var data = gentownfromciv(civtype);
+    console.log(data);
+    displaytown(data);
+}
+
+///////////////////////////// System Generation /////////////////////////////
+
+function systeminfogen() {
+    // Generates a system
+    var system = {};
+    system.planets = [];
+    system.name = namegen(1)[0];
+    system.planetcount = randomRange(4, 15);
+    for (var i = 0; i < system.planetcount; i++) {
+        system.planets.push(planetinfogen());
+    }
+    system.star = gensystemstar();
+    return system;
+}
+
+function gensystemstar() {
+    // Generates a star with random properties
+    var star = {};
+    star.type = pickRandom(["red dwarf", "red giant", "yellow dwarf", "yellow giant", "blue dwarf", "blue giant", "white dwarf", "white giant", "neutron", "black hole"]);
+    star.size = pickRandom(["small", "medium", "large"]);
+    star.color = pickRandom(["red", "orange", "yellow", "white", "blue", "purple"]);
+    star.age = pickRandom(["young", "middle-aged", "old", "collapsing"]);
+    if (star.type != "black hole") {
+        star.temperature = pickRandom(["hot", "very hot", "extremely hot", "scorching", "cold", "very cold", "extremely cold", "freezing"]);
+        star.luminosity = pickRandom(["dim", "bright", "very bright", "extremely bright"]);
+    } else {
+        star.temperature = "impossibly cold";
+        star.luminosity = pickRandom(["dim", "none", "none", "none", "none", "none"]);
+    }
+    return star;
 }
 
 ///////////////////////////// Planet Generation /////////////////////////////
