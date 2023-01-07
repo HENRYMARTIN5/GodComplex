@@ -83,21 +83,33 @@ function displayplanet(data) {
 }
 
 function displaycountry(data) {
-    var html = `
+    var prepend = "";
+    if (window.displayingtype != "country"){
+        if (window.displayingtype == "planet"){
+            prepend = `<a href="#" onclick="displayplanet(${window.displayingdata})">Back to planet</a><br><br>`;
+        } 
+    }
+    var html = prepend +`
     <h1>The ${data.type} of ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
     <p>Contains ${data.population} people, and is ruled by a ${data.government} government. It has a ${data.economy}, and is ${data.military} in military strength.</p>
     <p>It has ${data.numtowns} settlements inside it:</p>
     `;
     html += "<ul style='color: white;font-family: Arial, Helvetica, sans-serif;'>";
     for (var i = 0; i < data.towns.length; i++) {
-        html += `<li>${data.towns[i].name[0].toUpperCase() + data.towns[i].name.substring(1)}</li>`;
+        html += `<li><a href="#" onclick="displaytown(window.displayingdata.towns[${i}])">${data.towns[i].name[0].toUpperCase() + data.towns[i].name.substring(1)}</a></li>`;
     }
     html += "</ul>";
     writeContent(html);
 }
 
 function displaytown(data) {
-    var html = `
+    var prepend = "";
+    if (window.displayingtype != "town"){
+        if (window.displayingtype == "country"){
+            prepend = `<a href="#" onclick="displaycountry(window.displayingdata)">Back to country</a><br>`;
+        }
+    }
+    var html = prepend + `
     <h1>The ${data.type} of ${data.name[0].toUpperCase() + data.name.substring(1)}</h1>
     <p>This settlement contains ${data.population} people. It has a ${data.economy} economy, and is ${data.mood} towards outsiders.</p>
     `
@@ -108,12 +120,16 @@ function gensystem() {
     var data = systeminfogen();
     console.log(data);
     displaysystem(data);
+    window.displayingdata = data;
+    window.displayingtype = "system";
 }
 
 function genplanet() {
     var data = planetinfogen();
     console.log(data);
     displayplanet(data);
+    window.displayingdata = data;
+    window.displayingtype = "planet";
 }
 
 function gencountry() {
@@ -121,6 +137,8 @@ function gencountry() {
     var data = gencountryfromciv(civtype);
     console.log(data);
     displaycountry(data);
+    window.displayingdata = data;
+    window.displayingtype = "country";
 }
 
 function gentown() {
@@ -128,6 +146,8 @@ function gentown() {
     var data = gentownfromciv(civtype);
     console.log(data);
     displaytown(data);
+    window.displayingdata = data;
+    window.displayingtype = "town";
 }
 
 ///////////////////////////// System Generation /////////////////////////////
